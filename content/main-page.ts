@@ -1,3 +1,13 @@
+// Main landing customization guide
+//
+// 1. Most copy changes happen inside `mainPageContent`.
+// 2. If you only want to change text, counts, labels, or placeholders,
+//    edit this file and avoid touching component files.
+// 3. If you want to change layout/markup itself, update:
+//    - components/main-page/main-page-view.tsx
+//    - components/main-page/hero-preview-shell.tsx
+//    - components/main-page/main-lead-form.tsx
+
 export type MainPageNavItem = {
   label: string;
   href: string;
@@ -6,6 +16,19 @@ export type MainPageNavItem = {
 export type MainPageInfoCard = {
   title: string;
   description: string;
+};
+
+export type MainPageTheme = {
+  background: string;
+  foreground: string;
+  panel: string;
+  panelStrong: string;
+  border: string;
+  accent: string;
+  accentStrong: string;
+  muted: string;
+  glow: string;
+  selection: string;
 };
 
 export type MainPageHeroPreview = {
@@ -55,6 +78,7 @@ export type MainPageFormCopy = {
 };
 
 export type MainPageContent = {
+  theme: MainPageTheme;
   metadata: {
     title: string;
     description: string;
@@ -139,18 +163,36 @@ export type MainPageContent = {
 };
 
 export const mainPageContent: MainPageContent = {
+  // Global theme tokens for the main page and thanks page
+  // Change these values if you want to customize colors without touching CSS.
+  theme: {
+    background: "#f5f7f8",
+    foreground: "#0f172a",
+    panel: "#ffffff",
+    panelStrong: "#ffffff",
+    border: "#e2e8f0",
+    accent: "#3c83f6",
+    accentStrong: "#2f72dc",
+    muted: "#64748b",
+    glow: "rgba(60, 131, 246, 0.18)",
+    selection: "rgba(60, 131, 246, 0.2)"
+  },
+  // Browser title and description
   metadata: {
     title: "AI Note - 회의와 인터뷰 기록의 새로운 기준",
     description:
       "AI Note는 회의, 인터뷰, 사용자 피드백을 더 쉽게 정리하고 활용할 수 있도록 돕는 서비스 아이디어입니다. 현재 실제 수요를 확인하는 단계입니다."
   },
+  // Internal identifier used by analytics, lead API, and thanks access
   tracking: {
     landingSlug: "ai-note"
   },
+  // Top-left brand area
   brand: {
     name: "AI Note",
     mark: "✦"
   },
+  // Sticky top navigation
   nav: {
     items: [
       { label: "문제점", href: "#problem" },
@@ -160,6 +202,7 @@ export const mainPageContent: MainPageContent = {
     ],
     ctaLabel: "출시 소식 받기"
   },
+  // First screen: badge, headline, subheadline, hero CTA, right preview box
   hero: {
     badge: "서비스 준비 중",
     headline: "회의와 인터뷰 기록, 정리가 아니라 활용까지 이어지고 있나요?",
@@ -198,10 +241,11 @@ export const mainPageContent: MainPageContent = {
       submitErrorFallback: "제출 중 문제가 발생했습니다."
     }
   },
+  // Problem section cards
   problem: {
     id: "problem",
     eyebrow: "Problem",
-    title: "기록은 쌓이는데, 다시 보기는 힘드셨죠?",
+    title: "기록은 쌓이는데, 다시 보기는 힘드셨죠? 아니요!!",
     description:
       "수많은 미팅 기록과 인터뷰 데이터 속에서 중요한 인사이트를 찾는 일은 늘 번거롭고 많은 시간이 소요됩니다. 정리 자체에 에너지를 쏟느라 정작 중요한 실행을 놓치고 있지는 않나요?",
     cards: [
@@ -225,6 +269,7 @@ export const mainPageContent: MainPageContent = {
       }
     ]
   },
+  // Solution section: left grid cards + right bullet list
   solution: {
     id: "solution",
     eyebrow: "Solution",
@@ -260,6 +305,7 @@ export const mainPageContent: MainPageContent = {
       "실제 서비스 출시 전, 관심 등록과 사용 의향 데이터부터 먼저 검증할 수 있습니다."
     ]
   },
+  // Benefit section cards
   benefits: {
     id: "benefits",
     eyebrow: "기능",
@@ -290,6 +336,7 @@ export const mainPageContent: MainPageContent = {
       }
     ]
   },
+  // Metrics / proof section
   socialProof: {
     eyebrow: "관심 지표",
     title: "실제 사용 의향을 확인하기 위한 최소한의 숫자",
@@ -313,6 +360,7 @@ export const mainPageContent: MainPageContent = {
       }
     ]
   },
+  // Main signup section in the middle of the page
   leadCapture: {
     id: "lead-capture",
     eyebrow: "관심 등록",
@@ -334,6 +382,7 @@ export const mainPageContent: MainPageContent = {
       submitErrorFallback: "제출 중 문제가 발생했습니다."
     }
   },
+  // FAQ accordion
   faq: {
     id: "faq",
     title: "자주 묻는 질문",
@@ -355,12 +404,14 @@ export const mainPageContent: MainPageContent = {
       }
     ]
   },
+  // Final call-to-action block near the bottom
   finalCta: {
     title: "이 서비스가 필요하다면, 먼저 이메일로 알려주세요.",
     description:
       "아직은 실제 서비스 출시 전 단계입니다. 하지만 관심 등록이 충분히 모인다면 가장 먼저 베타 테스트와 업데이트 소식을 안내드릴 예정입니다.",
     ctaLabel: "출시 알림 받기"
   },
+  // Success page copy shown after a valid form submission
   thanks: {
     eyebrow: "Thank You",
     title: "관심 등록이 완료되었습니다. 출시 소식을 가장 먼저 안내드릴게요.",
@@ -382,6 +433,7 @@ export const mainPageContent: MainPageContent = {
     ],
     backHomeLabel: "홈으로 돌아가기"
   },
+  // Footer copy
   footer: {
     copyright: "© 2026 AI Note Team. All rights reserved.",
     disclaimer:

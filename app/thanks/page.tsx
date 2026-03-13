@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import { PageViewTracker } from "@/components/analytics/page-view-tracker";
 import { mainPageContent } from "@/content/main-page";
+import { getMainPageThemeStyle } from "@/lib/main-page-theme";
 import { THANKS_ACCESS_COOKIE } from "@/lib/thanks-access";
 
 export default async function ThanksPage() {
@@ -15,43 +16,48 @@ export default async function ThanksPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-4xl items-center px-6 py-20">
-      <PageViewTracker
-        eventName="thank_you_view"
-        props={{ landingSlug: mainPageContent.tracking.landingSlug }}
-      />
+    <div
+      style={getMainPageThemeStyle(mainPageContent.theme)}
+      className="min-h-screen bg-[var(--background)] text-[var(--foreground)]"
+    >
+      <main className="mx-auto flex min-h-screen max-w-4xl items-center px-6 py-20">
+        <PageViewTracker
+          eventName="thank_you_view"
+          props={{ landingSlug: mainPageContent.tracking.landingSlug }}
+        />
 
-      <div className="surface-strong w-full rounded-[36px] p-8 md:p-12">
-        <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--accent-strong)]">
-          {mainPageContent.thanks.eyebrow}
-        </p>
-        <h1 className="mt-4 max-w-2xl font-[var(--font-heading)] text-4xl leading-tight md:text-5xl">
-          {mainPageContent.thanks.title}
-        </h1>
-        <p className="mt-5 max-w-2xl text-lg leading-8 text-[var(--muted)]">
-          {mainPageContent.thanks.description}
-        </p>
+        <div className="surface-strong w-full rounded-[36px] p-8 md:p-12">
+          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--accent-strong)]">
+            {mainPageContent.thanks.eyebrow}
+          </p>
+          <h1 className="mt-4 max-w-2xl font-[var(--font-heading)] text-4xl leading-tight md:text-5xl">
+            {mainPageContent.thanks.title}
+          </h1>
+          <p className="mt-5 max-w-2xl text-lg leading-8 text-[var(--muted)]">
+            {mainPageContent.thanks.description}
+          </p>
 
-        <div className="mt-10 grid gap-4 md:grid-cols-3">
-          {mainPageContent.thanks.actions.map((action) => (
-            <div key={action.title} className="surface rounded-[24px] p-5">
-              <p className="font-semibold">{action.title}</p>
-              <p className="mt-2 text-sm text-[var(--muted)]">
-                {action.description}
-              </p>
-            </div>
-          ))}
+          <div className="mt-10 grid gap-4 md:grid-cols-3">
+            {mainPageContent.thanks.actions.map((action) => (
+              <div key={action.title} className="surface rounded-[24px] p-5">
+                <p className="font-semibold">{action.title}</p>
+                <p className="mt-2 text-sm text-[var(--muted)]">
+                  {action.description}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-10">
+            <Link
+              href="/"
+              className="inline-flex rounded-full bg-[var(--foreground)] px-5 py-3 text-sm font-semibold text-white"
+            >
+              {mainPageContent.thanks.backHomeLabel}
+            </Link>
+          </div>
         </div>
-
-        <div className="mt-10">
-          <Link
-            href="/"
-            className="inline-flex rounded-full bg-[var(--foreground)] px-5 py-3 text-sm font-semibold text-white"
-          >
-            {mainPageContent.thanks.backHomeLabel}
-          </Link>
-        </div>
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }

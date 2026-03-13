@@ -3,6 +3,7 @@ import { TrackedAnchor } from "@/components/analytics/tracked-anchor";
 import { HeroPreviewShell } from "@/components/main-page/hero-preview-shell";
 import { MainLeadForm } from "@/components/main-page/main-lead-form";
 import { MainPageContent } from "@/content/main-page";
+import { getMainPageThemeStyle } from "@/lib/main-page-theme";
 
 type MainPageViewProps = {
   content: MainPageContent;
@@ -26,7 +27,10 @@ function getSolutionToneClass(tone: "soft" | "dark" | "default" | "primary") {
 
 export function MainPageView({ content }: MainPageViewProps) {
   return (
-    <>
+    <div
+      style={getMainPageThemeStyle(content.theme)}
+      className="min-h-screen bg-[var(--background)] text-[var(--foreground)]"
+    >
       <PageViewTracker
         eventName="page_view"
         props={{ landingSlug: content.tracking.landingSlug }}
@@ -367,6 +371,6 @@ export function MainPageView({ content }: MainPageViewProps) {
           </p>
         </div>
       </footer>
-    </>
+    </div>
   );
 }
