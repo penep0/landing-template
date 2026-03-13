@@ -1,0 +1,22 @@
+import type { Metadata } from "next";
+
+import "./globals.css";
+
+export const metadata: Metadata = {
+  title: "Landing Template",
+  description: "Reusable multi-slug landing system for rapid idea validation."
+};
+
+type RootLayoutProps = Readonly<{
+  children: React.ReactNode;
+}>;
+
+export default function RootLayout({ children }: RootLayoutProps) {
+  return (
+    <html lang="ko">
+      <body className="text-[var(--foreground)] antialiased">
+        <div className="grid-noise min-h-screen">{children}</div>
+      </body>
+    </html>
+  );
+}

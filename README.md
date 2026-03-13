@@ -2,6 +2,18 @@
 
 아이디어를 빠르게 검증하기 위한 재사용형 랜딩페이지 템플릿 프로젝트입니다.
 
+## 빠른 시작
+
+1. `npm install`
+2. `.env.example`을 참고해 `.env.local` 생성
+3. `supabase/schema.sql`을 Supabase SQL Editor에서 실행
+4. `npm run dev`
+
+샘플 랜딩:
+
+- `/ai-note`
+- `/resume-helper`
+
 목표는 매번 새로운 랜딩을 처음부터 만드는 대신, 공통 템플릿과 공통 수집 구조를 재사용하면서 `카피`, `이미지`, `CTA`, `slug`만 바꿔 빠르게 배포하는 것입니다.
 
 ## 목표
