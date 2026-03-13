@@ -22,12 +22,14 @@ type MainLeadFormProps = {
 type FormState = {
   name: string;
   email: string;
+  message: string;
   honeypot: string;
 };
 
 const INITIAL_FORM_STATE: FormState = {
   name: "",
   email: "",
+  message: "",
   honeypot: ""
 };
 
@@ -90,6 +92,7 @@ export function MainLeadForm({
           landingSlug,
           name: values.name,
           email: values.email,
+          message: values.message,
           honeypot: values.honeypot,
           ctaVariant,
           utm,
@@ -175,6 +178,39 @@ export function MainLeadForm({
         )}
       </label>
 
+      {variant === "hero" ? (
+        <p className="text-xs leading-6 text-[var(--muted)]">{form.helperText}</p>
+      ) : null}
+
+      {form.messageLabel || form.messagePlaceholder ? (
+        <label className="block">
+          {variant === "panel" || variant === "hero" ? (
+            <span className="mb-2 block text-sm font-medium">
+              {form.messageLabel ?? "의견 남기기"}
+            </span>
+          ) : null}
+
+          <textarea
+            value={values.message}
+            onFocus={handleFieldFocus}
+            onChange={(event) => updateField("message", event.target.value)}
+            maxLength={2000}
+            rows={variant === "hero" ? 4 : 5}
+            className={
+              variant === "hero"
+                ? "w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20"
+                : "w-full rounded-xl border border-[var(--border)] bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-[var(--accent)] focus:bg-white"
+            }
+            placeholder={form.messagePlaceholder}
+          />
+          {form.messageHelperText ? (
+            <p className="mt-2 text-xs leading-6 text-[var(--muted)]">
+              {form.messageHelperText}
+            </p>
+          ) : null}
+        </label>
+      ) : null}
+
       <label className="hidden">
         <span>Leave this field empty</span>
         <input
@@ -196,7 +232,9 @@ export function MainLeadForm({
         </button>
       ) : null}
 
-      <p className="text-xs leading-6 text-[var(--muted)]">{form.helperText}</p>
+      {variant === "panel" ? (
+        <p className="text-xs leading-6 text-[var(--muted)]">{form.helperText}</p>
+      ) : null}
 
       {status === "error" ? (
         <p className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -206,4 +244,3 @@ export function MainLeadForm({
     </form>
   );
 }
-

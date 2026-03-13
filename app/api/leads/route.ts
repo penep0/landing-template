@@ -101,6 +101,7 @@ export async function POST(request: Request) {
   }
 
   const lead = parsed.data;
+  const normalizedMessage = lead.message.trim();
 
   if (lead.landingSlug !== mainPageContent.tracking.landingSlug) {
     return NextResponse.json(
@@ -111,6 +112,25 @@ export async function POST(request: Request) {
         status: 400
       }
     );
+  }
+
+  if (normalizedMessage) {
+    const messageRateLimit = checkRateLimit(`message:${ipHash}`, {
+      windowMs: 10 * 60_000,
+      maxRequests: 2
+    });
+
+    if (!messageRateLimit.allowed) {
+      return NextResponse.json(
+        {
+          message:
+            "의견 제출은 너무 자주 보낼 수 없습니다. 잠시 후 다시 시도해 주세요."
+        },
+        {
+          status: 429
+        }
+      );
+    }
   }
 
   if (lead.honeypot) {
@@ -141,7 +161,7 @@ export async function POST(request: Request) {
       name: lead.name || null,
       email: normalizedEmail,
       phone: lead.phone || null,
-      message: lead.message || null,
+      message: normalizedMessage || null,
       company: lead.company || null,
       job_title: lead.jobTitle || null,
       cta_variant: lead.ctaVariant,

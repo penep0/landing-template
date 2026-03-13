@@ -1,5 +1,5 @@
-const WINDOW_MS = 60_000;
-const MAX_REQUESTS = 5;
+const DEFAULT_WINDOW_MS = 60_000;
+const DEFAULT_MAX_REQUESTS = 5;
 
 type RateLimitBucket = {
   count: number;
@@ -8,14 +8,21 @@ type RateLimitBucket = {
 
 const buckets = new Map<string, RateLimitBucket>();
 
-export function checkRateLimit(key: string) {
+type RateLimitOptions = {
+  windowMs?: number;
+  maxRequests?: number;
+};
+
+export function checkRateLimit(key: string, options: RateLimitOptions = {}) {
+  const windowMs = options.windowMs ?? DEFAULT_WINDOW_MS;
+  const maxRequests = options.maxRequests ?? DEFAULT_MAX_REQUESTS;
   const now = Date.now();
   const current = buckets.get(key);
 
   if (!current || current.resetAt < now) {
     buckets.set(key, {
       count: 1,
-      resetAt: now + WINDOW_MS
+      resetAt: now + windowMs
     });
 
     return {
@@ -23,7 +30,7 @@ export function checkRateLimit(key: string) {
     };
   }
 
-  if (current.count >= MAX_REQUESTS) {
+  if (current.count >= maxRequests) {
     return {
       allowed: false
     };
@@ -36,4 +43,3 @@ export function checkRateLimit(key: string) {
     allowed: true
   };
 }
-

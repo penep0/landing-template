@@ -5,7 +5,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Landing Template",
-  description: "Reusable multi-slug landing system for rapid idea validation."
+  description: "Single landing page for collecting demand-validation leads."
 };
 
 type RootLayoutProps = Readonly<{
