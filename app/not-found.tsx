@@ -15,7 +15,7 @@ export default function NotFoundPage() {
         </p>
         <Link
           href="/"
-          className="mt-8 inline-flex rounded-full bg-[var(--foreground)] px-5 py-3 text-sm font-semibold text-white"
+          className="mt-8 inline-flex rounded-full bg-[var(--foreground)] px-5 py-3 text-sm font-semibold !text-white visited:!text-white hover:!text-white"
         >
           홈으로 돌아가기
         </Link>
@@ -23,4 +23,3 @@ export default function NotFoundPage() {
     </main>
   );
 }
-

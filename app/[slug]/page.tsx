@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
 import { LandingPageView } from "@/components/landing/landing-page";
 import {
@@ -44,7 +44,7 @@ export default async function LandingPage({ params }: LandingPageProps) {
   const { slug } = await params;
 
   if (slug === MAIN_LANDING_SLUG) {
-    redirect("/");
+    notFound();
   }
 
   const landing = getLandingContent(slug);
