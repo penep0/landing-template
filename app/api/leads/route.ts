@@ -44,6 +44,17 @@ function createThanksRedirectResponse() {
   return response;
 }
 
+function createDuplicateLeadResponse() {
+  return NextResponse.json(
+    {
+      message: "이미 신청된 이메일입니다."
+    },
+    {
+      status: 409
+    }
+  );
+}
+
 export async function POST(request: Request) {
   const clientIp = getClientIp(request);
   const ipHash = hashIpAddress(clientIp);
@@ -108,10 +119,27 @@ export async function POST(request: Request) {
 
   try {
     const supabase = createSupabaseAdminClient();
+    const normalizedEmail = lead.email.trim().toLowerCase();
+    const { data: existingLead, error: existingLeadError } = await supabase
+      .from("leads")
+      .select("id")
+      .eq("landing_slug", lead.landingSlug)
+      .eq("email", normalizedEmail)
+      .limit(1)
+      .maybeSingle();
+
+    if (existingLeadError) {
+      throw existingLeadError;
+    }
+
+    if (existingLead) {
+      return createDuplicateLeadResponse();
+    }
+
     const { error } = await supabase.from("leads").insert({
       landing_slug: lead.landingSlug,
       name: lead.name || null,
-      email: lead.email.toLowerCase(),
+      email: normalizedEmail,
       phone: lead.phone || null,
       message: lead.message || null,
       company: lead.company || null,
@@ -128,6 +156,10 @@ export async function POST(request: Request) {
     });
 
     if (error) {
+      if (error.code === "23505") {
+        return createDuplicateLeadResponse();
+      }
+
       throw error;
     }
 

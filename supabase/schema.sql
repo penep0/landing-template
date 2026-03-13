@@ -30,4 +30,4 @@ create table if not exists public.leads (
 create index if not exists leads_landing_slug_idx on public.leads (landing_slug);
 create index if not exists leads_created_at_idx on public.leads (created_at desc);
 create index if not exists leads_email_idx on public.leads (email);
-
+create unique index if not exists leads_landing_slug_email_unique_idx on public.leads (landing_slug, email);

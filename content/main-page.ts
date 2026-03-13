@@ -18,6 +18,14 @@ export type MainPageInfoCard = {
   description: string;
 };
 
+export type MainPageThanksAction = {
+  title: string;
+  description: string;
+  href?: string;
+  linkLabel?: string;
+  external?: boolean;
+};
+
 export type MainPageTheme = {
   background: string;
   foreground: string;
@@ -161,7 +169,7 @@ export type MainPageContent = {
     eyebrow: string;
     title: string;
     description: string;
-    actions: MainPageInfoCard[];
+    actions: MainPageThanksAction[];
     backHomeLabel: string;
   };
   footer: {
@@ -435,15 +443,27 @@ export const mainPageContent: MainPageContent = {
     actions: [
       {
         title: "캘린더 예약",
-        description: "초기 사용자 인터뷰나 데모 콜을 연결하는 다음 액션 영역입니다."
+        description:
+          "초기 사용자 인터뷰나 데모 콜을 연결하는 다음 액션 영역입니다.",
+        linkLabel: "예약 링크 열기",
+        href: "https://www.notion.so/feat-4L-22409d059e47803d92edfe769e338be4?source=copy_link",
+        external: true
       },
       {
         title: "커뮤니티 초대",
-        description: "오픈채팅, 슬랙, 대기자 명단 후속 채널에 연결할 수 있습니다."
+        description:
+          "오픈채팅, 디스코드, 대기자 명단 후속 채널에 연결할 수 있습니다.",
+        linkLabel: "커뮤니티 열기",
+        href: "https://www.notion.so/feat-4L-22409d059e47803d92edfe769e338be4?source=copy_link",
+        external: true
       },
       {
         title: "추가 자료",
-        description: "제품 소개서, 사례, 데모 영상 같은 자료를 제공할 수 있습니다."
+        description:
+          "제품 소개서, 사례, 데모 영상 같은 자료를 제공할 수 있습니다.",
+        linkLabel: "자료 보기",
+        href: "https://www.notion.so/your-page",
+        // external: true
       }
     ],
     backHomeLabel: "홈으로 돌아가기"

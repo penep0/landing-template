@@ -44,6 +44,25 @@ export default async function ThanksPage() {
                 <p className="mt-2 text-sm text-[var(--muted)]">
                   {action.description}
                 </p>
+                {action.href ? (
+                  action.external ? (
+                    <a
+                      href={action.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mt-5 inline-flex rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold !text-white visited:!text-white hover:!text-white"
+                    >
+                      {action.linkLabel ?? "바로 가기"}
+                    </a>
+                  ) : (
+                    <Link
+                      href={action.href}
+                      className="mt-5 inline-flex rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold !text-white visited:!text-white hover:!text-white"
+                    >
+                      {action.linkLabel ?? "바로 가기"}
+                    </Link>
+                  )
+                ) : null}
               </div>
             ))}
           </div>
@@ -51,7 +70,7 @@ export default async function ThanksPage() {
           <div className="mt-10">
             <Link
               href="/"
-              className="inline-flex rounded-full bg-[var(--foreground)] px-5 py-3 text-sm font-semibold text-white"
+              className="inline-flex rounded-full bg-[var(--foreground)] px-5 py-3 text-sm font-semibold !text-white visited:!text-white hover:!text-white"
             >
               {mainPageContent.thanks.backHomeLabel}
             </Link>
