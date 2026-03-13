@@ -19,6 +19,34 @@ export function TrackedAnchor({
   trackingProps,
   children
 }: TrackedAnchorProps) {
+  if (href.startsWith("#")) {
+    return (
+      <a
+        href={href}
+        className={className}
+        onClick={(event) => {
+          trackEvent(eventName, trackingProps);
+
+          const targetId = href.slice(1);
+          const targetElement = document.getElementById(targetId);
+
+          if (!targetElement) {
+            return;
+          }
+
+          event.preventDefault();
+          targetElement.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+          });
+          window.history.replaceState(null, "", href);
+        }}
+      >
+        {children}
+      </a>
+    );
+  }
+
   return (
     <Link
       href={href}
@@ -31,4 +59,3 @@ export function TrackedAnchor({
     </Link>
   );
 }
-

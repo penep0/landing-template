@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import { PageViewTracker } from "@/components/analytics/page-view-tracker";
 import { TrackedAnchor } from "@/components/analytics/tracked-anchor";
 import { HeroPreviewShell } from "@/components/main-page/hero-preview-shell";
@@ -26,6 +28,8 @@ function getSolutionToneClass(tone: "soft" | "dark" | "default" | "primary") {
 }
 
 export function MainPageView({ content }: MainPageViewProps) {
+  const brandLogo = content.brand.logo;
+
   return (
     <div
       style={getMainPageThemeStyle(content.theme)}
@@ -39,9 +43,21 @@ export function MainPageView({ content }: MainPageViewProps) {
       <nav className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--background)]/85 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-6">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--accent)]/10 text-sm font-bold text-[var(--accent-strong)]">
-              {content.brand.mark}
-            </div>
+            {brandLogo ? (
+              <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-white/80">
+                <Image
+                  src={brandLogo.src}
+                  alt={brandLogo.alt}
+                  width={brandLogo.width}
+                  height={brandLogo.height}
+                  className="h-full w-full object-contain"
+                />
+              </div>
+            ) : (
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--accent)]/10 text-sm font-bold text-[var(--accent-strong)]">
+                {content.brand.mark}
+              </div>
+            )}
             <p className="text-base font-bold tracking-tight">{content.brand.name}</p>
           </div>
 
@@ -64,7 +80,7 @@ export function MainPageView({ content }: MainPageViewProps) {
               landingSlug: content.tracking.landingSlug,
               ctaVariant: "nav-primary"
             }}
-            className="inline-flex items-center justify-center rounded-lg bg-[var(--accent)] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[var(--accent-strong)]"
+            className="inline-flex items-center justify-center rounded-lg bg-[var(--accent)] px-5 py-2.5 text-sm font-bold !text-white visited:!text-white hover:!text-white transition hover:bg-[var(--accent-strong)]"
           >
             {content.nav.ctaLabel}
           </TrackedAnchor>
@@ -89,23 +105,6 @@ export function MainPageView({ content }: MainPageViewProps) {
               <p className="mt-6 max-w-2xl text-lg leading-8 text-[var(--muted)] md:text-xl">
                 {content.hero.subheadline}
               </p>
-
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-                <TrackedAnchor
-                  href={`#${content.leadCapture.id}`}
-                  eventName="hero_cta_click"
-                  trackingProps={{
-                    landingSlug: content.tracking.landingSlug,
-                    ctaVariant: "hero-primary"
-                  }}
-                  className="inline-flex items-center justify-center rounded-xl bg-[var(--accent)] px-6 py-4 text-sm font-bold text-white transition hover:shadow-lg hover:shadow-[var(--glow)]"
-                >
-                  {content.hero.ctaLabel}
-                </TrackedAnchor>
-                <p className="text-sm text-[var(--muted)]">
-                  {content.hero.ctaSubtext}
-                </p>
-              </div>
 
               <MainLeadForm
                 landingSlug={content.tracking.landingSlug}
@@ -347,7 +346,7 @@ export function MainPageView({ content }: MainPageViewProps) {
                 landingSlug: content.tracking.landingSlug,
                 ctaVariant: "final-cta"
               }}
-              className="inline-flex items-center justify-center rounded-xl bg-[var(--accent)] px-6 py-4 text-lg font-bold text-white transition hover:bg-[var(--accent-strong)] hover:shadow-lg hover:shadow-[var(--glow)]"
+              className="inline-flex items-center justify-center rounded-xl bg-[var(--accent)] px-6 py-4 text-lg font-bold !text-white visited:!text-white hover:!text-white transition hover:bg-[var(--accent-strong)] hover:shadow-lg hover:shadow-[var(--glow)]"
             >
               {content.finalCta.ctaLabel}
             </TrackedAnchor>
@@ -358,9 +357,21 @@ export function MainPageView({ content }: MainPageViewProps) {
       <footer className="border-t border-[var(--border)] bg-white">
         <div className="mx-auto max-w-5xl px-6 py-12 text-center">
           <div className="mb-6 flex items-center justify-center gap-2 opacity-60">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[var(--accent)]/10 text-sm font-bold text-[var(--accent-strong)]">
-              {content.brand.mark}
-            </div>
+            {brandLogo ? (
+              <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-xl bg-white/80">
+                <Image
+                  src={brandLogo.src}
+                  alt={brandLogo.alt}
+                  width={brandLogo.width}
+                  height={brandLogo.height}
+                  className="h-full w-full object-contain"
+                />
+              </div>
+            ) : (
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[var(--accent)]/10 text-sm font-bold text-[var(--accent-strong)]">
+                {content.brand.mark}
+              </div>
+            )}
             <span className="text-lg font-bold tracking-tight">
               {content.brand.name}
             </span>

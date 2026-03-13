@@ -31,6 +31,13 @@ export type MainPageTheme = {
   selection: string;
 };
 
+export type MainPageBrandLogo = {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+};
+
 export type MainPageHeroPreview = {
   icon: string;
   title: string;
@@ -89,6 +96,7 @@ export type MainPageContent = {
   brand: {
     name: string;
     mark: string;
+    logo?: MainPageBrandLogo;
   };
   nav: {
     items: MainPageNavItem[];
@@ -191,6 +199,13 @@ export const mainPageContent: MainPageContent = {
   brand: {
     name: "AI Note",
     mark: "✦"
+    // Example:
+    // logo: {
+    //   src: "/logo/ai-note.png",
+    //   alt: "AI Note logo",
+    //   width: 36,
+    //   height: 36
+    // }
   },
   // Sticky top navigation
   nav: {
