@@ -2,11 +2,11 @@
 
 import { useEffect } from "react";
 
-import { trackEvent } from "@/lib/analytics";
+import { type AnalyticsEventProps, trackEvent } from "@/lib/analytics";
 
 type PageViewTrackerProps = {
   eventName: string;
-  props?: Record<string, unknown>;
+  props?: AnalyticsEventProps;
 };
 
 export function PageViewTracker({
@@ -19,4 +19,3 @@ export function PageViewTracker({
 
   return null;
 }
-

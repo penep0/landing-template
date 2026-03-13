@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 
-import { trackEvent } from "@/lib/analytics";
+import { type AnalyticsEventProps, trackEvent } from "@/lib/analytics";
 
 type TrackedAnchorProps = {
   href: string;
   className?: string;
   eventName: string;
-  trackingProps?: Record<string, unknown>;
+  trackingProps?: AnalyticsEventProps;
   children: React.ReactNode;
 };
 

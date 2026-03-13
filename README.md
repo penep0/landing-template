@@ -1,162 +1,104 @@
-# Landing Template
+# AI Note Landing
 
-아이디어를 빠르게 검증하기 위한 재사용형 랜딩페이지 템플릿 프로젝트입니다.
+단일 랜딩페이지로 서비스 수요를 검증하고, 이메일 리드를 직접 수집하는 Next.js 프로젝트입니다.
 
-## 빠른 시작
+지금 구조는 "여러 slug를 돌리는 템플릿"이 아니라, 메인 `/` 랜딩 하나를 빠르게 커스텀하고 운영하는 데 맞춰 정리되어 있습니다.
 
-1. `npm install`
-2. `.env.example`을 참고해 `.env.local` 생성
-3. `supabase/schema.sql`을 Supabase SQL Editor에서 실행
-4. `npm run dev`
+## What It Does
 
-샘플 랜딩:
+- 메인 페이지 `/`에서 서비스 소개와 관심 등록 폼 제공
+- `POST /api/leads`로 리드 저장
+- 제출 성공 시 `/thanks` 페이지 이동
+- `thanks` 페이지는 폼 제출 성공 후에만 접근 가능
+- `UTM`, `referrer`, `cta_variant`, `ip_hash`까지 함께 저장
+- 색상, 카피, 로고, FAQ, CTA를 한 파일에서 커스텀 가능
 
-- `/ai-note`
-- `/resume-helper`
+## Stack
 
-목표는 매번 새로운 랜딩을 처음부터 만드는 대신, 공통 템플릿과 공통 수집 구조를 재사용하면서 `카피`, `이미지`, `CTA`, `slug`만 바꿔 빠르게 배포하는 것입니다.
+- `Next.js 16` App Router
+- `TypeScript`
+- `Tailwind CSS v4`
+- `Supabase`
+- `zod`
 
-## 목표
+## Routes
 
-- 하나의 코드베이스로 여러 아이디어를 검증한다.
-- 공통 레이아웃, 컴포넌트, 배포 구조를 재사용한다.
-- 리드 수집은 외부 폼이 아니라 자체 페이지에서 직접 처리한다.
-- 실험마다 `유입`, `CTA 클릭`, `폼 제출`, `전환율`을 비교 가능하게 만든다.
+- `/` : 메인 랜딩 페이지
+- `/thanks` : 제출 완료 페이지
+- `/api/leads` : 리드 저장 API
+- `/api/health` : 상태 확인 API
+- `/_not-found` : 404 페이지
 
-## 핵심 방향
+## Quick Start
 
-- 페이지 구조는 공통 템플릿으로 유지한다.
-- 아이디어별 차이는 콘텐츠 파일로 분리한다.
-- 폼 제출은 서버를 거쳐 `Supabase`에 저장한다.
-- 배포는 `Vercel`에서 빠르게 반복한다.
+```bash
+npm install
+npm run dev
+```
 
-## 추천 기술 스택
+브라우저에서:
 
-- 프레임워크: `Next.js` `App Router` + `TypeScript`
-- 스타일: `Tailwind CSS`
-- 데이터베이스: `Supabase`
-- 폼 처리: `Route Handler` 또는 `Server Action`
-- 데이터 검증: `zod`
-- 분석: `GA4` 또는 `Plausible`
-- 배포: `Vercel`
-- 스팸 방지: `honeypot` + `rate limit` + 필요 시 `Cloudflare Turnstile`
+```bash
+http://localhost:3000
+```
 
-## 왜 이 조합인가
+## Scripts
 
-- `Next.js`는 SEO, 메타태그, OG, 서버 처리에 유리하다.
-- `Tailwind CSS`는 랜딩 페이지를 빠르게 반복 제작하기 좋다.
-- `Supabase`는 리드 데이터를 직접 소유하면서도 구축 비용이 낮다.
-- `Vercel`은 Git 기반 배포와 Preview 배포 흐름이 단순하다.
+```bash
+npm run dev
+npm run build
+npm run start
+npm run lint
+npm run typecheck
+```
 
-## 제품 운영 방식
+`dev`와 `build`는 현재 `webpack` 모드로 실행됩니다. 개발 환경에서 Turbopack 캐시 문제를 피하기 위한 설정입니다.
 
-하나의 프로젝트 안에서 여러 랜딩을 `slug` 기준으로 운영한다.
+## Environment Variables
+
+`.env.example` 기준:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+NEXT_PUBLIC_GA_ID=
+NEXT_PUBLIC_PLAUSIBLE_DOMAIN=
+```
+
+현재 실제로 필수인 값은 아래 둘입니다.
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+
+`NEXT_PUBLIC_SUPABASE_ANON_KEY`는 예시로 남아 있지만, 현재 코드에서는 직접 사용하지 않습니다.
+
+## Supabase Setup
+
+1. Supabase 프로젝트 생성
+2. `.env.local` 생성 후 환경변수 입력
+3. [supabase/schema.sql](/Users/yunjeong-yun/Project/landing-template/supabase/schema.sql) 실행
+4. 개발 서버 재시작
 
 예시:
 
-- `yourdomain.com/ai-note`
-- `yourdomain.com/resume-helper`
-- `yourdomain.com/meeting-copilot`
+```bash
+cp .env.example .env.local
+```
 
-새로운 아이디어가 생기면 페이지 구조를 다시 만들지 않고, 해당 아이디어에 대한 콘텐츠 파일만 추가해서 같은 템플릿으로 배포한다.
+## DB Schema
 
-## 전체 아키텍처
+현재 스키마 파일:
 
-사용자 흐름:
+- [supabase/schema.sql](/Users/yunjeong-yun/Project/landing-template/supabase/schema.sql)
 
-`랜딩 방문 -> CTA 클릭 -> 폼 입력 -> 서버 검증 -> Supabase 저장 -> thank you 페이지 이동`
+핵심 테이블은 `leads`입니다.
 
-핵심 원칙:
+저장되는 주요 필드:
 
-- 브라우저는 입력과 표시만 담당한다.
-- 리드 저장은 서버에서 처리한다.
-- 분석과 추적에 필요한 UTM 정보를 함께 저장한다.
-- 공통 UI와 공통 데이터 수집 구조를 유지한다.
-
-## 페이지 구조
-
-- `/[slug]`: 아이디어별 랜딩 페이지
-- `/thanks`: 제출 완료 페이지
-- `/api/leads`: 리드 저장 API
-- `/admin`: 추후 내부 조회 페이지
-- `/api/health`: 선택적 상태 확인 API
-
-## 권장 섹션 구성
-
-- `Hero`
-- `Problem`
-- `Solution`
-- `BenefitList`
-- `SocialProof`
-- `FAQ`
-- `FinalCTA`
-
-이 섹션들은 컴포넌트화하고, 실제 내용은 각 `slug`별 콘텐츠 파일에서 주입한다.
-
-## 콘텐츠 관리 방식
-
-아이디어별 페이지 내용은 `content/*.ts` 또는 `content/*.json`으로 관리한다.
-
-예시 데이터 필드:
-
-- `title`
-- `headline`
-- `subheadline`
-- `ctaLabel`
-- `benefits`
-- `faq`
-- `heroImage`
-- `formType`
-- `successMessage`
-
-예시 파일:
-
-- `content/ai-note.ts`
-- `content/resume-helper.ts`
-
-## 폼 수집 방식
-
-외부 폼 임베드 대신, 랜딩 페이지 안에서 직접 입력받고 서버를 통해 `Supabase`에 저장한다.
-
-권장 흐름:
-
-1. 사용자가 랜딩 페이지에서 폼을 작성한다.
-2. 프론트엔드가 1차 검증을 수행한다.
-3. `POST /api/leads`로 데이터를 전송한다.
-4. 서버에서 `zod`로 2차 검증을 수행한다.
-5. `honeypot`, `rate limit`, 중복 체크를 확인한다.
-6. `Supabase`의 `leads` 테이블에 저장한다.
-7. 성공 시 `/thanks?slug=...` 페이지로 이동한다.
-
-## Supabase를 쓰는 이유
-
-- `Postgres` 기반이라 데이터 구조 확장이 쉽다.
-- 리드 데이터를 직접 소유할 수 있다.
-- `UTM`, `referrer`, `landing_slug` 같은 마케팅 정보를 함께 저장하기 좋다.
-- 이후 이메일 발송, 관리자 화면, 자동화 연결이 쉽다.
-
-## 권장 DB 스키마
-
-초기에는 `landings`, `leads` 두 개 테이블이면 충분하다.
-
-### `landings`
-
-- `id`
-- `slug` `unique`
-- `name`
-- `status` (`draft`, `active`, `archived`)
-- `created_at`
-
-### `leads`
-
-- `id`
 - `landing_slug`
 - `name`
 - `email`
-- `phone`
-- `message`
-- `company`
-- `job_title`
 - `cta_variant`
 - `utm_source`
 - `utm_medium`
@@ -168,311 +110,223 @@
 - `ip_hash`
 - `created_at`
 
-## 최소 SQL 예시
+## Lead Flow
 
-```sql
-create table public.landings (
-  id bigint generated always as identity primary key,
-  slug text not null unique,
-  name text not null,
-  status text not null default 'draft',
-  created_at timestamptz not null default now()
-);
+현재 제출 흐름:
 
-create table public.leads (
-  id bigint generated always as identity primary key,
-  landing_slug text not null,
-  name text,
-  email text not null,
-  phone text,
-  message text,
-  company text,
-  job_title text,
-  cta_variant text,
-  utm_source text,
-  utm_medium text,
-  utm_campaign text,
-  utm_term text,
-  utm_content text,
-  referrer text,
-  user_agent text,
-  ip_hash text,
-  created_at timestamptz not null default now()
-);
+1. 사용자가 메인 페이지에서 이메일 입력
+2. 클라이언트가 `/api/leads`로 POST
+3. 서버에서 `zod` 검증
+4. `honeypot` 및 간단한 `rate limit` 검사
+5. Supabase `leads` 테이블에 insert
+6. 성공 시 접근용 쿠키 발급
+7. `/thanks`로 이동
 
-create index leads_landing_slug_idx on public.leads (landing_slug);
-create index leads_created_at_idx on public.leads (created_at desc);
-create index leads_email_idx on public.leads (email);
-```
+## Thanks Page Access Rule
 
-## 중복 제출 정책
+`/thanks`는 URL 직접 접근으로는 볼 수 없습니다.
 
-운영 방식에 따라 둘 중 하나를 선택한다.
+- 폼 제출 성공 시에만 접근용 쿠키를 발급
+- 쿠키가 없으면 `/thanks` 접근 시 `/`로 리다이렉트
 
-- 엄격 차단: `unique (landing_slug, email)` 적용
-- 느슨한 허용: 중복 저장 후 운영에서 정리
+관련 파일:
 
-초기 검증 단계에서는 느슨하게 받고, 이후 필요 시 중복 정책을 강화하는 편이 실용적이다.
+- [app/thanks/page.tsx](/Users/yunjeong-yun/Project/landing-template/app/thanks/page.tsx)
+- [lib/thanks-access.ts](/Users/yunjeong-yun/Project/landing-template/lib/thanks-access.ts)
 
-## 보안 및 권한 정책
+## Customizing The Page
 
-`Supabase` 사용 시 가장 중요한 원칙은 클라이언트에 민감한 키를 노출하지 않는 것이다.
+가장 중요한 파일:
 
-- 브라우저에는 `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`만 사용 가능
-- 서버에서는 `SUPABASE_SERVICE_ROLE_KEY` 사용
-- `service_role` 키는 절대 클라이언트에 노출하지 않음
+- [content/main-page.ts](/Users/yunjeong-yun/Project/landing-template/content/main-page.ts)
 
-권장 방식:
+이 파일에서 거의 모든 메인 페이지 데이터를 바꿀 수 있습니다.
 
-- 브라우저는 폼 데이터만 API로 전송
-- 서버가 `Supabase`에 insert 수행
-- `leads` 테이블은 클라이언트 직접 insert를 허용하지 않음
+### Copy / Content
 
-## RLS 정책
+아래 항목은 모두 `mainPageContent`에서 수정합니다.
 
-`RLS`는 켜는 것을 권장한다.
+- `metadata`
+- `brand`
+- `nav`
+- `hero`
+- `problem`
+- `solution`
+- `benefits`
+- `socialProof`
+- `leadCapture`
+- `faq`
+- `finalCta`
+- `thanks`
+- `footer`
 
-초기 구조에서는 서버만 데이터 저장을 담당하므로 아래 방향이 단순하다.
+예를 들어:
 
-- `leads` 테이블은 공개 조회 불가
-- 클라이언트 직접 insert 불가
-- 서버만 `service_role`로 insert 가능
+- 메인 제목 변경 → `mainPageContent.hero.headline`
+- CTA 문구 변경 → `mainPageContent.hero.ctaLabel`
+- FAQ 수정 → `mainPageContent.faq.items`
+- 제출 완료 페이지 문구 수정 → `mainPageContent.thanks`
 
-이렇게 하면 스팸, 오용, 키 노출 위험을 줄이기 쉽다.
+### Colors / Theme
 
-## 폼 필드 권장안
+이제 색상도 `mainPageContent.theme`에서 바꿀 수 있습니다.
 
-초기 검증에서는 필드 수를 최소화하는 것이 전환율에 유리하다.
+수정 가능한 테마 토큰:
 
-기본 권장:
+- `background`
+- `foreground`
+- `panel`
+- `panelStrong`
+- `border`
+- `accent`
+- `accentStrong`
+- `muted`
+- `glow`
+- `selection`
 
-- 필수: `email`
-- 선택: `name`
+예시:
 
-아이디어에 따라 선택적으로 추가:
-
-- `phone`
-- `message`
-- `company`
-- `job_title`
-
-초기 MVP에서는 `email + name(optional)` 조합을 우선 추천한다.
-
-## API 예시
-
-`POST /api/leads`
-
-예시 요청:
-
-```json
-{
-  "landingSlug": "ai-note",
-  "name": "홍길동",
-  "email": "test@example.com",
-  "phone": "",
-  "message": "",
-  "ctaVariant": "hero-primary",
-  "utm": {
-    "source": "google",
-    "medium": "cpc",
-    "campaign": "waitlist-launch",
-    "term": "",
-    "content": "headline-a"
-  },
-  "referrer": "https://google.com"
+```ts
+theme: {
+  background: "#f5f7f8",
+  foreground: "#0f172a",
+  panel: "#ffffff",
+  panelStrong: "#ffffff",
+  border: "#e2e8f0",
+  accent: "#3c83f6",
+  accentStrong: "#2f72dc",
+  muted: "#64748b",
+  glow: "rgba(60, 131, 246, 0.18)",
+  selection: "rgba(60, 131, 246, 0.2)"
 }
 ```
 
-## 검증 규칙
+### Logo
 
-- `landingSlug`: 필수, 허용된 slug인지 확인
-- `email`: 필수, 이메일 형식 검증
-- `name`: 길이 제한
-- `message`: 길이 제한
-- `honeypot`: 반드시 비어 있어야 함
-- 짧은 시간 내 반복 제출은 차단 가능
+로고는 `brand.logo`를 넣으면 상단 네비와 footer에 같이 반영됩니다.
 
-## UTM 수집 방식
+예시:
 
-마케팅 실험 비교를 위해 UTM 값을 저장한다.
+```ts
+brand: {
+  name: "AI Note",
+  mark: "✦",
+  logo: {
+    src: "/logo/ai-note.png",
+    alt: "AI Note logo",
+    width: 36,
+    height: 36
+  }
+}
+```
 
-권장 흐름:
+`logo`가 없으면 `mark` 문자를 대신 사용합니다.
 
-- 랜딩 진입 시 URL 쿼리에서 `utm_*` 읽기
-- `localStorage` 또는 hidden input에 저장
-- 폼 제출 시 함께 서버로 전달
-- `Supabase`에 리드와 함께 저장
+이미지 파일은 보통 `public/logo/...` 아래에 두면 됩니다.
 
-이렇게 하면 어떤 유입 채널이 실제 전환으로 이어졌는지 바로 분석 가능하다.
+### Layout / UI Structure
 
-## 감사 페이지
+문구 말고 "구조 자체"를 바꾸고 싶으면 아래 파일을 수정합니다.
 
-제출 완료 후 이동 페이지:
+- [components/main-page/main-page-view.tsx](/Users/yunjeong-yun/Project/landing-template/components/main-page/main-page-view.tsx)
+  페이지 전체 섹션 구조
 
-- `/thanks?slug=ai-note`
+- [components/main-page/hero-preview-shell.tsx](/Users/yunjeong-yun/Project/landing-template/components/main-page/hero-preview-shell.tsx)
+  히어로 오른쪽 preview 박스 구조
 
-이 페이지에서 할 수 있는 것:
+- [components/main-page/main-lead-form.tsx](/Users/yunjeong-yun/Project/landing-template/components/main-page/main-lead-form.tsx)
+  폼 마크업 및 입력 UI
 
-- 제출 완료 메시지 표시
-- 다음 행동 유도
-- 추가 공유 CTA 제공
+전역 CSS 기본값은:
 
-예시 CTA:
+- [app/globals.css](/Users/yunjeong-yun/Project/landing-template/app/globals.css)
 
-- 캘린더 예약
-- 오픈채팅 입장
-- 친구 공유
-- 제품 데모 보기
-
-## 분석 이벤트
-
-최소한 아래 이벤트는 추적한다.
-
-- `page_view`
-- `hero_cta_click`
-- `form_start`
-- `form_submit_success`
-- `thank_you_view`
-
-실험 초기에는 이 정도만으로도 랜딩 성과 비교에 충분하다.
-
-## 스팸 방지 전략
-
-초기 권장 조합:
-
-- 숨김 `honeypot` 필드
-- 서버 검증
-- 간단한 `rate limit`
-
-트래픽 증가 시 추가:
-
-- `Cloudflare Turnstile`
-- 이메일 중복 체크
-- IP/디바이스 기준 제한 강화
-
-## 추천 폴더 구조
+## File Structure
 
 ```txt
 app/
-  [slug]/
-    page.tsx
-  thanks/
-    page.tsx
   api/
+    health/
+      route.ts
     leads/
       route.ts
+  thanks/
+    page.tsx
+  globals.css
+  layout.tsx
+  not-found.tsx
+  page.tsx
 
 components/
-  landing/
-    hero.tsx
-    benefit-list.tsx
-    faq.tsx
-    lead-form.tsx
-    final-cta.tsx
+  analytics/
+    page-view-tracker.tsx
+    tracked-anchor.tsx
+  main-page/
+    hero-preview-shell.tsx
+    main-lead-form.tsx
+    main-page-view.tsx
 
 content/
-  ai-note.ts
-  resume-helper.ts
-  index.ts
+  main-page.ts
 
 lib/
-  supabase/
-    server.ts
   analytics.ts
+  main-page-theme.ts
+  rate-limit.ts
+  thanks-access.ts
   utm.ts
   validation/
     lead.ts
+  supabase/
+    server.ts
+
+supabase/
+  schema.sql
 ```
 
-## 배포 방식
+## Key Files
 
-초기 권장 방식은 `Vercel` 단일 프로젝트 운영이다.
+- [app/page.tsx](/Users/yunjeong-yun/Project/landing-template/app/page.tsx)
+  메인 페이지 진입점
 
-- 하나의 프로젝트에 여러 `slug` 페이지를 포함한다.
-- `main` 브랜치에 push 하면 production 배포한다.
-- Pull Request마다 preview 배포를 활용한다.
-- 성과가 좋은 아이디어만 추후 독립 도메인 또는 독립 프로젝트로 분리한다.
+- [content/main-page.ts](/Users/yunjeong-yun/Project/landing-template/content/main-page.ts)
+  메인 페이지의 모든 콘텐츠와 테마 데이터
 
-## 환경 변수
+- [components/main-page/main-page-view.tsx](/Users/yunjeong-yun/Project/landing-template/components/main-page/main-page-view.tsx)
+  메인 랜딩 UI 조립
 
-`Vercel`에 아래 환경 변수를 등록한다.
+- [components/main-page/main-lead-form.tsx](/Users/yunjeong-yun/Project/landing-template/components/main-page/main-lead-form.tsx)
+  리드 폼 UI 및 제출 처리
 
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY`
-- `NEXT_PUBLIC_GA_ID` 또는 `PLAUSIBLE_DOMAIN`
+- [app/api/leads/route.ts](/Users/yunjeong-yun/Project/landing-template/app/api/leads/route.ts)
+  서버 저장 로직
 
-## 도메인 운영 계획
+- [lib/supabase/server.ts](/Users/yunjeong-yun/Project/landing-template/lib/supabase/server.ts)
+  서버용 Supabase 클라이언트
 
-### 1단계
+## Validation
 
-- `yourdomain.com/[slug]`
+프로젝트 검증 명령:
 
-장점:
+```bash
+npm run lint
+npm run typecheck
+npm run build
+```
 
-- 가장 빠르게 운영 가능
-- 코드와 배포 관리가 단순함
+## Current Status
 
-### 2단계
+현재 상태:
 
-- `idea.yourdomain.com`
+- 메인 랜딩 페이지 구현 완료
+- 커스텀 데이터 구조 정리 완료
+- 색상/로고 커스텀 가능
+- Supabase 연동 코드 구현 완료
+- `thanks` 접근 제한 완료
 
-조건:
+아직 필요한 것:
 
-- 특정 아이디어가 성과가 좋을 때만 분리
-
-### 3단계
-
-- 독립 리포지토리 + 독립 도메인
-
-조건:
-
-- 검증이 끝나고 제품화 단계로 넘어갈 때
-
-## 구현 우선순위
-
-### 1차 MVP
-
-- `Next.js` 기본 세팅
-- 공통 랜딩 섹션 컴포넌트 작성
-- `slug` 기반 다중 랜딩 라우팅
-- `Supabase` 연결
-- `/api/leads` 구현
-- `/thanks` 페이지 구현
-
-### 2차 개선
-
-- UTM 저장
-- 분석 스크립트 연결
-- 스팸 방지 강화
-- README 및 운영 문서 보완
-
-### 3차 확장
-
-- 관리자 조회 페이지
-- A/B 테스트
-- OG 이미지 자동화
-- 이메일 자동 발송
-
-## 실무 운영 원칙
-
-- 템플릿은 재사용하되 카피는 매번 새로 맞춘다.
-- 필드는 최소화한다.
-- 디자인보다 메시지 검증 속도를 우선한다.
-- 실패한 실험은 삭제보다 비활성화로 관리한다.
-- 운영 초기에는 `Supabase Dashboard`로 조회하고, 필요 시 admin UI를 붙인다.
-
-## MVP 결론
-
-이 프로젝트의 첫 버전은 아래 범위로 시작하는 것이 가장 현실적이다.
-
-- 하나의 공통 랜딩 템플릿
-- 여러 `slug` 지원
-- 자체 폼 입력
-- 서버를 통한 `Supabase` 저장
-- `/thanks` 페이지
-- UTM 저장
-- 기본 전환 분석
-- `Vercel` 자동 배포
-
-이 범위만 갖춰도 아이디어 검증용 랜딩을 빠르게 복제하고, 실제 전환 데이터를 직접 축적하는 운영이 가능하다.
+- 실제 Supabase 프로젝트 생성
+- `.env.local` 설정
+- `schema.sql` 실행
+- 실제 폼 제출 테스트

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/react";
 
 import "./globals.css";
 
@@ -16,6 +17,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
     <html lang="ko">
       <body className="text-[var(--foreground)] antialiased">
         <div className="grid-noise min-h-screen">{children}</div>
+        <Analytics />
       </body>
     </html>
   );
