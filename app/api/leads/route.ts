@@ -7,8 +7,8 @@ import {
   THANKS_ACCESS_COOKIE,
   THANKS_ACCESS_MAX_AGE_SECONDS
 } from "@/lib/thanks-access";
-import { createSupabaseAdminClient } from "@/lib/supabase/server";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { createSupabaseAdminClient } from "@/lib/supabase/server";
 import { leadSchema } from "@/lib/validation/lead";
 
 function getClientIp(request: Request) {
@@ -54,6 +54,13 @@ function createDuplicateLeadResponse() {
     }
   );
 }
+
+function isValidEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+const FEEDBACK_RATE_LIMIT_WINDOW_MS = 10 * 60_000;
+const FEEDBACK_RATE_LIMIT_MAX_REQUESTS = 2;
 
 export async function POST(request: Request) {
   const clientIp = getClientIp(request);
@@ -101,6 +108,7 @@ export async function POST(request: Request) {
   }
 
   const lead = parsed.data;
+  const normalizedEmail = lead.email.trim().toLowerCase();
   const normalizedMessage = lead.message.trim();
 
   if (lead.landingSlug !== mainPageContent.tracking.landingSlug) {
@@ -114,23 +122,37 @@ export async function POST(request: Request) {
     );
   }
 
-  if (normalizedMessage) {
-    const messageRateLimit = checkRateLimit(`message:${ipHash}`, {
-      windowMs: 10 * 60_000,
-      maxRequests: 2
-    });
+  if (lead.submitMode === "signup" && !normalizedEmail) {
+    return NextResponse.json(
+      {
+        message: "이메일을 입력해주세요."
+      },
+      {
+        status: 400
+      }
+    );
+  }
 
-    if (!messageRateLimit.allowed) {
-      return NextResponse.json(
-        {
-          message:
-            "의견 제출은 너무 자주 보낼 수 없습니다. 잠시 후 다시 시도해 주세요."
-        },
-        {
-          status: 429
-        }
-      );
-    }
+  if (normalizedEmail && !isValidEmail(normalizedEmail)) {
+    return NextResponse.json(
+      {
+        message: "올바른 이메일 주소를 입력해주세요."
+      },
+      {
+        status: 400
+      }
+    );
+  }
+
+  if (lead.submitMode === "feedback" && !normalizedMessage) {
+    return NextResponse.json(
+      {
+        message: "의견을 입력한 뒤 보내주세요."
+      },
+      {
+        status: 400
+      }
+    );
   }
 
   if (lead.honeypot) {
@@ -139,44 +161,96 @@ export async function POST(request: Request) {
 
   try {
     const supabase = createSupabaseAdminClient();
-    const normalizedEmail = lead.email.trim().toLowerCase();
-    const { data: existingLead, error: existingLeadError } = await supabase
-      .from("leads")
-      .select("id")
-      .eq("landing_slug", lead.landingSlug)
-      .eq("email", normalizedEmail)
-      .limit(1)
-      .maybeSingle();
 
-    if (existingLeadError) {
-      throw existingLeadError;
+    if (lead.submitMode === "feedback") {
+      const windowStart = new Date(
+        Date.now() - FEEDBACK_RATE_LIMIT_WINDOW_MS
+      ).toISOString();
+      const { count, error: feedbackRateLimitError } = await supabase
+        .from("feedbacks")
+        .select("id", {
+          count: "exact",
+          head: true
+        })
+        .eq("landing_slug", lead.landingSlug)
+        .eq("ip_hash", ipHash)
+        .gte("created_at", windowStart);
+
+      if (feedbackRateLimitError) {
+        throw feedbackRateLimitError;
+      }
+
+      if ((count ?? 0) >= FEEDBACK_RATE_LIMIT_MAX_REQUESTS) {
+        return NextResponse.json(
+          {
+            message:
+              "의견 제출은 너무 자주 보낼 수 없습니다. 잠시 후 다시 시도해 주세요."
+          },
+          {
+            status: 429
+          }
+        );
+      }
     }
 
-    if (existingLead) {
-      return createDuplicateLeadResponse();
+    if (lead.submitMode === "signup" && normalizedEmail) {
+      const { data: existingLead, error: existingLeadError } = await supabase
+        .from("leads")
+        .select("id")
+        .eq("landing_slug", lead.landingSlug)
+        .eq("email", normalizedEmail)
+        .limit(1)
+        .maybeSingle();
+
+      if (existingLeadError) {
+        throw existingLeadError;
+      }
+
+      if (existingLead) {
+        return createDuplicateLeadResponse();
+      }
     }
 
-    const { error } = await supabase.from("leads").insert({
-      landing_slug: lead.landingSlug,
-      name: lead.name || null,
-      email: normalizedEmail,
-      phone: lead.phone || null,
-      message: normalizedMessage || null,
-      company: lead.company || null,
-      job_title: lead.jobTitle || null,
-      cta_variant: lead.ctaVariant,
-      utm_source: lead.utm.source || null,
-      utm_medium: lead.utm.medium || null,
-      utm_campaign: lead.utm.campaign || null,
-      utm_term: lead.utm.term || null,
-      utm_content: lead.utm.content || null,
-      referrer: lead.referrer || null,
-      user_agent: request.headers.get("user-agent"),
-      ip_hash: ipHash
-    });
+    const targetTable = lead.submitMode === "feedback" ? "feedbacks" : "leads";
+    const insertPayload =
+      lead.submitMode === "feedback"
+        ? {
+            landing_slug: lead.landingSlug,
+            name: lead.name || null,
+            email: normalizedEmail || null,
+            message: normalizedMessage,
+            cta_variant: lead.ctaVariant,
+            utm_source: lead.utm.source || null,
+            utm_medium: lead.utm.medium || null,
+            utm_campaign: lead.utm.campaign || null,
+            utm_term: lead.utm.term || null,
+            utm_content: lead.utm.content || null,
+            referrer: lead.referrer || null,
+            user_agent: request.headers.get("user-agent"),
+            ip_hash: ipHash
+          }
+        : {
+            landing_slug: lead.landingSlug,
+            name: lead.name || null,
+            email: normalizedEmail,
+            phone: lead.phone || null,
+            company: lead.company || null,
+            job_title: lead.jobTitle || null,
+            cta_variant: lead.ctaVariant,
+            utm_source: lead.utm.source || null,
+            utm_medium: lead.utm.medium || null,
+            utm_campaign: lead.utm.campaign || null,
+            utm_term: lead.utm.term || null,
+            utm_content: lead.utm.content || null,
+            referrer: lead.referrer || null,
+            user_agent: request.headers.get("user-agent"),
+            ip_hash: ipHash
+          };
+
+    const { error } = await supabase.from(targetTable).insert(insertPayload);
 
     if (error) {
-      if (error.code === "23505") {
+      if (error.code === "23505" && lead.submitMode === "signup" && normalizedEmail) {
         return createDuplicateLeadResponse();
       }
 

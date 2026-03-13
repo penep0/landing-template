@@ -2,11 +2,28 @@ create table if not exists public.leads (
   id bigint generated always as identity primary key,
   landing_slug text not null,
   name text,
-  email text not null,
+  email text,
   phone text,
-  message text,
   company text,
   job_title text,
+  cta_variant text,
+  utm_source text,
+  utm_medium text,
+  utm_campaign text,
+  utm_term text,
+  utm_content text,
+  referrer text,
+  user_agent text,
+  ip_hash text,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.feedbacks (
+  id bigint generated always as identity primary key,
+  landing_slug text not null,
+  name text,
+  email text,
+  message text not null,
   cta_variant text,
   utm_source text,
   utm_medium text,
@@ -22,4 +39,7 @@ create table if not exists public.leads (
 create index if not exists leads_landing_slug_idx on public.leads (landing_slug);
 create index if not exists leads_created_at_idx on public.leads (created_at desc);
 create index if not exists leads_email_idx on public.leads (email);
-create unique index if not exists leads_landing_slug_email_unique_idx on public.leads (landing_slug, email);
+create unique index if not exists leads_landing_slug_email_unique_idx on public.leads (landing_slug, email) where email is not null;
+create index if not exists feedbacks_landing_slug_idx on public.feedbacks (landing_slug);
+create index if not exists feedbacks_created_at_idx on public.feedbacks (created_at desc);
+create index if not exists feedbacks_email_idx on public.feedbacks (email);

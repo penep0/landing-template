@@ -85,11 +85,17 @@ export type MainPageFormCopy = {
   namePlaceholder?: string;
   emailLabel?: string;
   emailPlaceholder: string;
+  emailRequiredError?: string;
+  emailInvalidError?: string;
   messageLabel?: string;
   messagePlaceholder?: string;
   messageHelperText?: string;
   submitLabel: string;
   submittingLabel: string;
+  feedbackSubmitLabel?: string;
+  feedbackSubmittingLabel?: string;
+  feedbackRequiredError?: string;
+  feedbackSuccessMessage?: string;
   helperText: string;
   networkError: string;
   submitErrorFallback: string;
@@ -260,6 +266,8 @@ export const mainPageContent: MainPageContent = {
     },
     form: {
       emailPlaceholder: "이메일 주소를 입력해주세요",
+      emailRequiredError: "이메일을 입력해주세요.",
+      emailInvalidError: "올바른 이메일 주소를 입력해주세요.",
       messageLabel: "의견 남기기 (선택)",
       messagePlaceholder:
         "이 서비스가 왜 필요하다고 느끼는지, 어떤 상황에서 쓰고 싶은지 적어주세요.",
@@ -267,6 +275,10 @@ export const mainPageContent: MainPageContent = {
         "짧은 의견도 좋습니다. 남겨주시면 제품 방향을 정하는 데 큰 도움이 됩니다.",
       submitLabel: "출시 소식 받기",
       submittingLabel: "제출 중...",
+      feedbackSubmitLabel: "의견 보내기",
+      feedbackSubmittingLabel: "의견 전송 중...",
+      feedbackRequiredError: "의견을 입력한 뒤 보내주세요.",
+      feedbackSuccessMessage: "의견이 전송되었습니다.",
       helperText: "등록 시 출시 소식과 얼리버드 혜택을 가장 먼저 보내드립니다.",
       networkError: "네트워크 오류로 제출하지 못했습니다.",
       submitErrorFallback: "제출 중 문제가 발생했습니다."
@@ -406,6 +418,8 @@ export const mainPageContent: MainPageContent = {
       namePlaceholder: "성함을 입력해주세요",
       emailLabel: "이메일 *",
       emailPlaceholder: "example@email.com",
+      emailRequiredError: "이메일을 입력해주세요.",
+      emailInvalidError: "올바른 이메일 주소를 입력해주세요.",
       messageLabel: "의견 남기기 (선택)",
       messagePlaceholder:
         "이 서비스에 기대하는 점이나 꼭 필요하다고 느낀 이유를 남겨주세요.",
@@ -413,6 +427,10 @@ export const mainPageContent: MainPageContent = {
         "의견이 포함된 제출은 스팸 방지를 위해 더 짧은 간격으로는 반복 제출할 수 없습니다.",
       submitLabel: "얼리 액세스 신청하기",
       submittingLabel: "제출 중...",
+      feedbackSubmitLabel: "의견 보내기",
+      feedbackSubmittingLabel: "의견 전송 중...",
+      feedbackRequiredError: "의견을 입력한 뒤 보내주세요.",
+      feedbackSuccessMessage: "의견이 전송되었습니다.",
       helperText: "신청하신 정보는 출시 소식 안내 및 서비스 개선을 위한 용도로만 사용됩니다.",
       networkError: "네트워크 오류로 제출하지 못했습니다.",
       submitErrorFallback: "제출 중 문제가 발생했습니다."

@@ -19,6 +19,8 @@ type MainLeadFormProps = {
   anchorId?: string;
 };
 
+type SubmitMode = "signup" | "feedback";
+
 type FormState = {
   name: string;
   email: string;
@@ -32,6 +34,10 @@ const INITIAL_FORM_STATE: FormState = {
   message: "",
   honeypot: ""
 };
+
+function isValidEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
 
 export function MainLeadForm({
   landingSlug,
@@ -53,8 +59,12 @@ export function MainLeadForm({
       content: fromLocation.content || stored.content
     };
   });
-  const [status, setStatus] = useState<"idle" | "submitting" | "error">("idle");
+  const [status, setStatus] = useState<
+    "idle" | "submitting" | "error" | "success"
+  >("idle");
+  const [activeSubmitMode, setActiveSubmitMode] = useState<SubmitMode>("signup");
   const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const trackedStart = useRef(false);
 
   useEffect(() => {
@@ -79,8 +89,43 @@ export function MainLeadForm({
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const nativeEvent = event.nativeEvent as SubmitEvent;
+    const submitter = nativeEvent.submitter;
+    const submitMode =
+      submitter instanceof HTMLButtonElement &&
+      submitter.value === "feedback"
+        ? "feedback"
+        : "signup";
+    const normalizedEmail = values.email.trim();
+    const normalizedMessage = values.message.trim();
+
+    if (submitMode === "signup" && !normalizedEmail) {
+      setStatus("error");
+      setSuccessMessage("");
+      setErrorMessage(form.emailRequiredError ?? "이메일을 입력해주세요.");
+      return;
+    }
+
+    if (normalizedEmail && !isValidEmail(normalizedEmail)) {
+      setStatus("error");
+      setSuccessMessage("");
+      setErrorMessage(
+        form.emailInvalidError ?? "올바른 이메일 주소를 입력해주세요."
+      );
+      return;
+    }
+
+    if (submitMode === "feedback" && !normalizedMessage) {
+      setStatus("error");
+      setSuccessMessage("");
+      setErrorMessage(form.feedbackRequiredError ?? "의견을 입력한 뒤 보내주세요.");
+      return;
+    }
+
+    setActiveSubmitMode(submitMode);
     setStatus("submitting");
     setErrorMessage("");
+    setSuccessMessage("");
 
     try {
       const response = await fetch("/api/leads", {
@@ -91,10 +136,11 @@ export function MainLeadForm({
         body: JSON.stringify({
           landingSlug,
           name: values.name,
-          email: values.email,
-          message: values.message,
+          email: normalizedEmail,
+          message: normalizedMessage,
           honeypot: values.honeypot,
-          ctaVariant,
+          ctaVariant: `${ctaVariant}-${submitMode}`,
+          submitMode,
           utm,
           referrer: document.referrer
         })
@@ -111,7 +157,25 @@ export function MainLeadForm({
         return;
       }
 
-      trackEvent("form_submit_success", { landingSlug, ctaVariant });
+      trackEvent(
+        submitMode === "feedback" ? "feedback_submit_success" : "form_submit_success",
+        {
+          landingSlug,
+          ctaVariant,
+          submitMode
+        }
+      );
+
+      if (submitMode === "feedback") {
+        setStatus("success");
+        setSuccessMessage(form.feedbackSuccessMessage ?? "의견이 전송되었습니다.");
+        setValues((current) => ({
+          ...current,
+          message: ""
+        }));
+        return;
+      }
+
       window.location.assign(result.redirectTo);
     } catch {
       setStatus("error");
@@ -122,6 +186,7 @@ export function MainLeadForm({
   return (
     <form
       id={anchorId}
+      noValidate
       className={variant === "hero" ? "mt-6 space-y-3" : "mt-6 space-y-4"}
       onSubmit={handleSubmit}
     >
@@ -150,7 +215,6 @@ export function MainLeadForm({
           <div className="flex flex-col gap-3 sm:flex-row">
             <input
               type="email"
-              required
               value={values.email}
               onFocus={handleFieldFocus}
               onChange={(event) => updateField("email", event.target.value)}
@@ -159,16 +223,18 @@ export function MainLeadForm({
             />
             <button
               type="submit"
+              value="signup"
               disabled={status === "submitting"}
               className="inline-flex items-center justify-center whitespace-nowrap rounded-xl bg-[var(--accent)] px-6 py-4 text-sm font-bold text-white transition hover:shadow-lg hover:shadow-[var(--glow)] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {status === "submitting" ? form.submittingLabel : form.submitLabel}
+              {status === "submitting" && activeSubmitMode === "signup"
+                ? form.submittingLabel
+                : form.submitLabel}
             </button>
           </div>
         ) : (
           <input
             type="email"
-            required
             value={values.email}
             onFocus={handleFieldFocus}
             onChange={(event) => updateField("email", event.target.value)}
@@ -225,10 +291,30 @@ export function MainLeadForm({
       {variant === "panel" ? (
         <button
           type="submit"
+          value="signup"
           disabled={status === "submitting"}
           className="inline-flex w-full items-center justify-center rounded-xl bg-[var(--accent)] px-5 py-4 text-lg font-bold text-white transition hover:bg-[var(--accent-strong)] hover:shadow-lg hover:shadow-[var(--glow)] disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {status === "submitting" ? form.submittingLabel : form.submitLabel}
+          {status === "submitting" && activeSubmitMode === "signup"
+            ? form.submittingLabel
+            : form.submitLabel}
+        </button>
+      ) : null}
+
+      {form.feedbackSubmitLabel ? (
+        <button
+          type="submit"
+          value="feedback"
+          disabled={status === "submitting"}
+          className={
+            variant === "hero"
+              ? "inline-flex items-center justify-center rounded-xl border border-[var(--accent)] bg-white px-5 py-3 text-sm font-semibold text-[var(--accent-strong)] transition hover:bg-[var(--accent)]/5 disabled:cursor-not-allowed disabled:opacity-60"
+              : "inline-flex w-full items-center justify-center rounded-xl border border-[var(--accent)] bg-white px-5 py-4 text-base font-semibold text-[var(--accent-strong)] transition hover:bg-[var(--accent)]/5 disabled:cursor-not-allowed disabled:opacity-60"
+          }
+        >
+          {status === "submitting" && activeSubmitMode === "feedback"
+            ? form.feedbackSubmittingLabel ?? form.submittingLabel
+            : form.feedbackSubmitLabel}
         </button>
       ) : null}
 
@@ -239,6 +325,12 @@ export function MainLeadForm({
       {status === "error" ? (
         <p className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">
           {errorMessage}
+        </p>
+      ) : null}
+
+      {status === "success" ? (
+        <p className="rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+          {successMessage}
         </p>
       ) : null}
     </form>
