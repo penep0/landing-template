@@ -1,29 +1,13 @@
 import type { Metadata } from "next";
 
-import { getLandingContent, MAIN_LANDING_SLUG } from "@/content";
-import { LandingPageView } from "@/components/landing/landing-page";
+import { MainPageView } from "@/components/main-page/main-page-view";
+import { mainPageContent } from "@/content/main-page";
 
-export const metadata: Metadata = (() => {
-  const landing = getLandingContent(MAIN_LANDING_SLUG);
-
-  if (!landing) {
-    return {
-      title: "Landing Template"
-    };
-  }
-
-  return {
-    title: landing.title,
-    description: landing.description
-  };
-})();
+export const metadata: Metadata = {
+  title: mainPageContent.metadata.title,
+  description: mainPageContent.metadata.description
+};
 
 export default function HomePage() {
-  const landing = getLandingContent(MAIN_LANDING_SLUG);
-
-  if (!landing) {
-    return null;
-  }
-
-  return <LandingPageView landing={landing} />;
+  return <MainPageView content={mainPageContent} />;
 }

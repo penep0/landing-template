@@ -2,7 +2,11 @@ import { createHash } from "node:crypto";
 
 import { NextResponse } from "next/server";
 
-import { getLandingContent } from "@/content";
+import { mainPageContent } from "@/content/main-page";
+import {
+  THANKS_ACCESS_COOKIE,
+  THANKS_ACCESS_MAX_AGE_SECONDS
+} from "@/lib/thanks-access";
 import { createSupabaseAdminClient } from "@/lib/supabase/server";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { leadSchema } from "@/lib/validation/lead";
@@ -19,6 +23,25 @@ function getClientIp(request: Request) {
 
 function hashIpAddress(ipAddress: string) {
   return createHash("sha256").update(ipAddress).digest("hex");
+}
+
+function createThanksRedirectResponse() {
+  const response = NextResponse.json({
+    ok: true,
+    redirectTo: "/thanks"
+  });
+
+  response.cookies.set({
+    name: THANKS_ACCESS_COOKIE,
+    value: mainPageContent.tracking.landingSlug,
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    maxAge: THANKS_ACCESS_MAX_AGE_SECONDS,
+    path: "/thanks"
+  });
+
+  return response;
 }
 
 export async function POST(request: Request) {
@@ -67,9 +90,8 @@ export async function POST(request: Request) {
   }
 
   const lead = parsed.data;
-  const landing = getLandingContent(lead.landingSlug);
 
-  if (!landing || landing.status !== "active") {
+  if (lead.landingSlug !== mainPageContent.tracking.landingSlug) {
     return NextResponse.json(
       {
         message: "허용되지 않은 landing slug입니다."
@@ -81,15 +103,7 @@ export async function POST(request: Request) {
   }
 
   if (lead.honeypot) {
-    return NextResponse.json(
-      {
-        message: "정상적으로 접수되었습니다.",
-        redirectTo: `/thanks?slug=${lead.landingSlug}`
-      },
-      {
-        status: 200
-      }
-    );
+    return createThanksRedirectResponse();
   }
 
   try {
@@ -117,10 +131,7 @@ export async function POST(request: Request) {
       throw error;
     }
 
-    return NextResponse.json({
-      ok: true,
-      redirectTo: `/thanks?slug=${lead.landingSlug}`
-    });
+    return createThanksRedirectResponse();
   } catch (error) {
     console.error("Failed to persist lead", error);
 
@@ -135,4 +146,3 @@ export async function POST(request: Request) {
     );
   }
 }
-
