@@ -4,6 +4,8 @@
 
 현재 구조는 "여러 랜딩을 동시에 운영하는 CMS"가 아니라, 메인 `/` 랜딩 하나를 빠르게 바꿔가며 수요 검증을 반복하는 데 맞춰져 있습니다.
 
+현재 [content/main-page.ts](/Users/yunjeong-yun/Project/landing-template/content/main-page.ts) 안에 들어 있는 서비스 카피는 샘플 데이터이며, 실제 사용 시 이 파일 내용을 원하는 서비스에 맞게 교체해서 사용하면 됩니다.
+
 ## What It Does
 
 - 메인 랜딩 `/` 제공
@@ -133,6 +135,8 @@ SUPABASE_SERVICE_ROLE_KEY=...
 4. [supabase/schema.sql](/Users/yunjeong-yun/Project/landing-template/supabase/schema.sql) 실행
 5. 개발 서버 재시작
 
+이미 예전 버전 스키마를 적용한 적이 있다면, 최신 [supabase/schema.sql](/Users/yunjeong-yun/Project/landing-template/supabase/schema.sql)을 다시 실행해 `feedbacks` 테이블과 최신 인덱스 상태를 맞추는 것이 좋습니다.
+
 예시:
 
 ```bash
@@ -149,6 +153,11 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 확인:
 
 - `http://localhost:3000/api/health`
+
+주의:
+
+- `/api/health`는 실제 DB 연결 성공을 보장하는 엔드포인트가 아니라, 서버가 Supabase 관련 env를 읽고 있는지 확인하는 용도입니다.
+- 즉 `supabaseConfigured: true`여도 SQL 미적용이나 권한 문제는 별도로 남아 있을 수 있습니다.
 
 정상 연결 후 테스트:
 
@@ -427,6 +436,21 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 3. 의견 제출 테스트
 4. Supabase `leads` / `feedbacks` 확인
 5. Vercel Analytics 대시보드 확인
+
+### Vercel CLI
+
+Dashboard 대신 CLI로도 같은 프로젝트를 배포할 수 있습니다.
+
+```bash
+npm i -g vercel
+vercel login
+vercel
+vercel env add NEXT_PUBLIC_SUPABASE_URL production
+vercel env add SUPABASE_SERVICE_ROLE_KEY production
+vercel --prod
+```
+
+필요하면 `preview` 환경에도 같은 env를 추가하면 됩니다.
 
 ## Health Check
 
