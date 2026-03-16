@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/react";
 
+import { getSiteUrl } from "@/lib/site-url";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Landing Template",
-  description: "Single landing page for collecting demand-validation leads."
+  description: "Single landing page for collecting demand-validation leads.",
+  metadataBase: new URL(getSiteUrl())
 };
 
 type RootLayoutProps = Readonly<{

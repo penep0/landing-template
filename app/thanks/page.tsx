@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -6,6 +7,13 @@ import { PageViewTracker } from "@/components/analytics/page-view-tracker";
 import { mainPageContent } from "@/content/main-page";
 import { getMainPageThemeStyle } from "@/lib/main-page-theme";
 import { THANKS_ACCESS_COOKIE } from "@/lib/thanks-access";
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false
+  }
+};
 
 export default async function ThanksPage() {
   const cookieStore = await cookies();
