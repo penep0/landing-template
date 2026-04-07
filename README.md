@@ -4,7 +4,7 @@
 
 현재 구조는 "여러 랜딩을 동시에 운영하는 CMS"가 아니라, 메인 `/` 랜딩 하나를 빠르게 바꿔가며 수요 검증을 반복하는 데 맞춰져 있습니다.
 
-현재 [content/main-page.ts](/Users/yunjeong-yun/Project/landing-template/content/main-page.ts) 안에 들어 있는 서비스 카피는 샘플 데이터이며, 실제 사용 시 이 파일 내용을 원하는 서비스에 맞게 교체해서 사용하면 됩니다.
+현재 [content/main-page.ts](/content/main-page.ts) 안에 들어 있는 서비스 카피는 샘플 데이터이며, 실제 사용 시 이 파일 내용을 원하는 서비스에 맞게 교체해서 사용하면 됩니다.
 
 ## What It Does
 
@@ -132,10 +132,10 @@ SUPABASE_SERVICE_ROLE_KEY=...
 1. Supabase 프로젝트 생성
 2. 루트에 `.env.local` 생성
 3. Supabase Dashboard에서 URL / key 복사
-4. [supabase/schema.sql](/Users/yunjeong-yun/Project/landing-template/supabase/schema.sql) 실행
+4. [supabase/schema.sql](/supabase/schema.sql) 실행
 5. 개발 서버 재시작
 
-이미 예전 버전 스키마를 적용한 적이 있다면, 최신 [supabase/schema.sql](/Users/yunjeong-yun/Project/landing-template/supabase/schema.sql)을 다시 실행해 `feedbacks` 테이블과 최신 인덱스 상태를 맞추는 것이 좋습니다.
+이미 예전 버전 스키마를 적용한 적이 있다면, 최신 [supabase/schema.sql](/supabase/schema.sql)을 다시 실행해 `feedbacks` 테이블과 최신 인덱스 상태를 맞추는 것이 좋습니다.
 
 예시:
 
@@ -170,7 +170,7 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
 스키마 파일:
 
-- [supabase/schema.sql](/Users/yunjeong-yun/Project/landing-template/supabase/schema.sql)
+- [supabase/schema.sql](/supabase/schema.sql)
 
 사용 테이블:
 
@@ -249,8 +249,8 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
 관련 파일:
 
-- [app/thanks/page.tsx](/Users/yunjeong-yun/Project/landing-template/app/thanks/page.tsx)
-- [lib/thanks-access.ts](/Users/yunjeong-yun/Project/landing-template/lib/thanks-access.ts)
+- [app/thanks/page.tsx](/app/thanks/page.tsx)
+- [lib/thanks-access.ts](/lib/thanks-access.ts)
 
 ## Analytics
 
@@ -273,15 +273,15 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
 관련 파일:
 
-- [app/layout.tsx](/Users/yunjeong-yun/Project/landing-template/app/layout.tsx)
-- [lib/analytics.ts](/Users/yunjeong-yun/Project/landing-template/lib/analytics.ts)
-- [components/analytics/tracked-anchor.tsx](/Users/yunjeong-yun/Project/landing-template/components/analytics/tracked-anchor.tsx)
+- [app/layout.tsx](/app/layout.tsx)
+- [lib/analytics.ts](/lib/analytics.ts)
+- [components/analytics/tracked-anchor.tsx](/components/analytics/tracked-anchor.tsx)
 
 ## Customization
 
 가장 중요한 파일:
 
-- [content/main-page.ts](/Users/yunjeong-yun/Project/landing-template/content/main-page.ts)
+- [content/main-page.ts](content/main-page.tss)
 
 이 파일 하나에서 거의 모든 랜딩 데이터를 바꿀 수 있습니다.
 
@@ -381,16 +381,16 @@ brand: {
 
 문구가 아니라 구조를 바꾸고 싶으면 아래 파일을 수정합니다.
 
-- [components/main-page/main-page-view.tsx](/Users/yunjeong-yun/Project/landing-template/components/main-page/main-page-view.tsx)
+- [components/main-page/main-page-view.tsx](/components/main-page/main-page-view.tsx)
   - 전체 섹션 구성
 
-- [components/main-page/hero-preview-shell.tsx](/Users/yunjeong-yun/Project/landing-template/components/main-page/hero-preview-shell.tsx)
+- [components/main-page/hero-preview-shell.tsx](/components/main-page/hero-preview-shell.tsx)
   - 히어로 오른쪽 프리뷰 카드
 
-- [components/main-page/main-lead-form.tsx](/Users/yunjeong-yun/Project/landing-template/components/main-page/main-lead-form.tsx)
+- [components/main-page/main-lead-form.tsx](/components/main-page/main-lead-form.tsx)
   - 이메일 등록 / 의견 제출 폼 UI
 
-- [app/globals.css](/Users/yunjeong-yun/Project/landing-template/app/globals.css)
+- [app/globals.css](/app/globals.css)
   - 전역 스타일
 
 ## Vercel Deployment
@@ -469,6 +469,6 @@ vercel --prod
 ## Notes
 
 - 현재 템플릿은 단일 랜딩 기준입니다.
-- 실제 서비스 내용은 [content/main-page.ts](/Users/yunjeong-yun/Project/landing-template/content/main-page.ts)만 바꾸면 대부분 교체할 수 있습니다.
+- 실제 서비스 내용은 [content/main-page.ts](/content/main-page.ts)만 바꾸면 대부분 교체할 수 있습니다.
 - `SUPABASE_SERVICE_ROLE_KEY`는 절대 Git에 올리면 안 됩니다.
 - `thanks.actions.href` 같은 실제 링크 값은 직접 채워야 합니다.
